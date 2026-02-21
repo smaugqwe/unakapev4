@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unakape - Inventory Monitoring System</title>
+    <link rel="stylesheet" href="design.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1><i class="fas fa-mug-hot"></i> Unakape</h1>
+                <p>Inventory Monitoring System</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="login-email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="login-password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn-primary"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </form>
+            <div class="login-footer">
+                <p>Don't have an account? <a href="#" onclick="showRegister()">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="register-page" class="login-container" style="display: none;">
+        <div class="login-box">
+            <div class="login-header">
+                <h1><i class="fas fa-mug-hot"></i> Unakape</h1>
+                <p>Create New Account</p>
+            </div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" id="register-name" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="register-email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="register-password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn-primary"><i class="fas fa-user-plus"></i> Register</button>
+            </form>
+            <div class="login-footer">
+                <p>Already have an account? <a href="#" onclick="showLogin()">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app-container" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-mug-hot"></i> Unakape</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-page="inventory">
+                    <i class="fas fa-boxes"></i> Inventory Items
+                </a>
+                <a href="#" class="nav-item" data-page="batches">
+                    <i class="fas fa-layer-group"></i> Batch Tracking
+                </a>
+                <a href="#" class="nav-item" data-page="lots">
+                    <i class="fas fa-clock"></i> Perishables Monitor
+                </a>
+                <a href="#" class="nav-item" data-page="sales">
+                    <i class="fas fa-shopping-cart"></i> Sales
+                </a>
+                <a href="#" class="nav-item" data-page="transactions">
+                    <i class="fas fa-list-alt"></i> Transactions Log
+                </a>
+                <a href="#" class="nav-item" data-page="forecasting">
+                    <i class="fas fa-chart-line"></i> Demand Forecasting
+                </a>
+                <a href="#" class="nav-item" data-page="reports">
+                    <i class="fas fa-file-alt"></i> Reports
+                </a>
+                <a href="#" class="nav-item admin-only" data-page="admin" style="display: none;">
+                    <i class="fas fa-user-shield"></i> Admin Panel
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="user-name">User</span>
+                </div>
+                <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page active">
+                <header class="page-header">
+                    <h1><i class="fas fa-th-large"></i> Dashboard</h1>
+                    <div class="header-actions">
+                        <span class="user-role" id="user-role-badge"></span>
+                    </div>
+                </header>
+                
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon"><i class="fas fa-boxes"></i></div>
+                        <div class="kpi-content">
+                            <h3>Total Items</h3>
+                            <p class="kpi-value" id="kpi-total-items">0</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon"><i class="fas fa-tags"></i></div>
+                        <div class="kpi-content">
+                            <h3>Categories</h3>
+                            <p class="kpi-value" id="kpi-categories">0</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card warning">
+                        <div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="kpi-content">
+                            <h3>Low Stock</h3>
+                            <p class="kpi-value" id="kpi-low-stock">0</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card danger">
+                        <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+                        <div class="kpi-content">
+                            <h3>Expiring Soon</h3>
+                            <p class="kpi-value" id="kpi-expiring">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Action Center -->
+                    <div class="card action-center">
+                        <div class="card-header">
+                            <h2><i class="fas fa-bell"></i> Action Center</h2>
+                        </div>
+                        <div class="card-body" id="alerts-list">
+                            <div class="alert-item">Loading alerts...</div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Levels Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-bar"></i> Stock Levels per Category</h2>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="stock-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Expiry Overview -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-calendar-check"></i> Expiration Risk Overview</h2>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="expiry-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-history"></i> Recent Transactions</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-transactions"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Page -->
+            <div id="page-inventory" class="page">
+                <header class="page-header">
+                    <h1><i class="fas fa-boxes"></i> Inventory Items</h1>
+                    <button class="btn-primary" onclick="showAddItemModal()">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                </header>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="toolbar">
+                            <input type="text" id="search-items" placeholder="Search items..." class="search-input">
+                            <select id="filter-category" class="filter-select">
+                                <option value="">All Categories</option>
+                            </select>
+                            <label><input type="checkbox" id="filter-low-stock"> Low Stock Only</label>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Reorder Level</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Batches Page -->
+            <div id="page-batches" class="page">
+                <header class="page-header">
+                    <h1><i class="fas fa-layer-group"></i> Batch Tracking</h1>
+                    <button class="btn-primary" onclick="showAddBatchModal()">
+                        <i class="fas fa-plus"></i> Add Batch
+                    </button>
+                </header>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Batch Number</th>
+                                    <th>Item</th>
+                                    <th>Production Date</th>
+                                    <th>Quantity</th>
+                                    <th>Remaining</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batches-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lots Page -->
+            <div id="page-lots" class="page">
+                <header class="page-header">
+                    <h1><i class="fas fa-clock"></i> Perishables Monitor</h1>
+                    <button class="btn-primary" onclick="showAddLotModal()">
+                        <i class="fas fa-plus"></i> Add Lot
+                    </button>
+                </header>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="toolbar">
+                            <select id="filter-expiry" class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="safe">Safe</option>
+                                <option value="expiring_soon">Expiring Soon</option>
+                                <option value="expired">Expired</option>
+                            </select>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Lot Number</th>
+                                    <th>Item</th>
+                                    <th>Expiration Date</th>
+                                    <th>Quantity</th>
+                                    <th>Remaining</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lots-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Page -->
+            <div id="page-sales" class="page">
+                <header class="page-header">
+                    <h1><i class="fas fa-shopping-cart"></i> Sales</h1>
+                    <button class="btn-primary" onclick="showAddSaleModal()">
+                        <i class="fas fa-plus"></i> New Sale
+                    </button>
+                </header>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                    <th>Sold By</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Page -->
+            <div id="page-transactions" class="page">
+                <header class="page-header">
+                    <h1><i class="fas fa-list-alt"></i> Transactions Log</h1>
+                </header>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="toolbar">
+                            <select id="filter-action" class="filter-select">
+                                <option value="">All Actions</option>
+                                <option value="ADD">Stock Added</option>
+                                <option value="SALE">Sale</option>
+                                <option value="UPDATE">Stock Updated</option>
+                                <option value="DELETE">Stock Deleted</option>
+                            </select>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forecasting Page -->
+            <div id="page-forecasting" class="page">
+                <header class="page-header">
+                    <h1><i class="fas fa-chart-line"></i> Demand Forecasting</h1>
+                </header>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="toolbar">
+                            <select id="forecast-item" class="filter-select">
+                                <option value="">Select Item</option>
+                            </select>
+                            <button class="btn-primary" onclick="generateForecast()">
+                                <i class="fas fa-sync"></i> Generate Forecast
+                            </button>
+                        </div>
+                        <div id="forecast-chart-container">
+                            <canvas id="forecast-chart"></canvas>
+                        </div>
+                        <div id="forecast-results" class="forecast-results"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="page-reports" class="page">
+                <header class="page-header">
+                    <h1><i class="fas fa-file-alt"></i> Reports</h1>
+                </header>
+                <div class="reports-grid">
+                    <div class="report-card" onclick="generateReport('inventory')">
+                        <i class="fas fa-boxes"></i>
+                        <h3>Inventory Report</h3>
+                        <p>Current stock levels and status</p>
+                    </div>
+                    <div class="report-card" onclick="generateReport('sales')">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>Sales Report</h3>
+                        <p>Sales transactions and revenue</p>
+                    </div>
+                    <div class="report-card" onclick="generateReport('expiry')">
+                        <i class="fas fa-clock"></i>
+                        <h3>Expiry Report</h3>
+                        <p>Items expiring soon and expired</p>
+                    </div>
+                    <div class="report-card" onclick="generateReport('forecast')">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Forecast Report</h3>
+                        <p>Demand forecasting results</p>
+                    </div>
+                </div>
+                <div class="card" id="report-output" style="display: none;">
+                    <div class="card-header">
+                        <h2 id="report-title">Report</h2>
+                        <button class="btn-secondary" onclick="exportReport('csv')">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table" id="report-table">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Page -->
+            <div id="page-admin" class="page">
+                <header class="page-header">
+                    <h1><i class="fas fa-user-shield"></i> Admin Panel</h1>
+                    <button class="btn-primary" onclick="showAddUserModal()">
+                        <i class="fas fa-user-plus"></i> Add Employee
+                    </button>
+                </header>
+                <div class="admin-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-users"></i> User Management</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-history"></i> Activity Logs</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activity-logs"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Modal</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-content"></div>
+        </div>
+    </div>
+
+    <script src="test.js"></script>
+</body>
+</html>
